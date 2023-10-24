@@ -58,15 +58,18 @@ def create_tag(tag: Tag) -> Tag:
         return tag
 
 
-
-@app.get("/notes/", response_class=NoteBase)
+@app.get("/notes/", response_model=list[NoteBase])
 def get_notes():
     with Session(engine) as session:
         notes = session.exec(select(Note)).all()
 
+        base_notes: list[NoteBase] = []
         for note in notes:
-            print(note.tags)
-        return notes
+            n = NoteBase(text=note.text, updated_at=note.updated_at, tags=[tag.name for tag in note.tags])
+
+            base_notes.append(n)
+            
+        return base_notes
 
 
 

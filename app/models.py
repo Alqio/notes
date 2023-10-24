@@ -20,12 +20,13 @@ class Tag(SQLModel, table=True):
 class NoteBase(BaseModel):
     text: str
     tags: List[str]
-    timestamp: Optional[datetime] = Field(default_factory=datetime.utcnow, nullable=False)
+    updated_at: Optional[datetime]
 
 
 class Note(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     text: str
-
+    updated_at: Optional[datetime] = Field(default_factory=datetime.utcnow, nullable=False)
+ 
     tags: List[Tag] = Relationship(back_populates="notes", link_model=NoteTagLink)
 
