@@ -1,10 +1,16 @@
 import os
-from sqlmodel import create_engine, SQLModel
-from sqlalchemy.engine import URL
+from sqlmodel import create_engine, SQLModel, Session
+from sqlalchemy.engine import Engine
 
 connection_string = f'postgresql://{os.getenv("POSTGRES_USER")}:{os.getenv("POSTGRES_PASSWORD")}@{os.getenv("DB_HOST")}/{os.getenv("POSTGRES_DB")}'
-print(connection_string)
 
-engine = create_engine(f'postgresql://{os.getenv("POSTGRES_USER")}:{os.getenv("POSTGRES_PASSWORD")}@{os.getenv("DB_HOST")}/{os.getenv("POSTGRES_DB")}', echo=True)
 
-SQLModel.metadata.create_all(engine)
+def create_db_and_tables() -> Engine:
+    print("Creating models.")
+    # Import models so that they are registered for SQLModel.metadata
+    import models
+    engine = create_engine(connection_string, echo=True)
+    SQLModel.metadata.create_all(engine)
+
+    print("Created models.")
+    return engine
