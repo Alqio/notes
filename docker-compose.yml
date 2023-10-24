@@ -4,5 +4,21 @@ services:
   backend:
     build: .
     network_mode: host
+    env_file:
+      - .env
     volumes:
       - "./app/:/app/"
+
+  db:
+    image: postgres:11.9-alpine
+    restart: always
+    ports:
+      - "6007:5432"
+    env_file:
+      - .env
+    volumes:
+      - db-data:/var/lib/postgresql/data/
+
+volumes:
+  db-data:
+    driver: local
