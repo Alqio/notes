@@ -10,7 +10,6 @@ def create_db_and_tables() -> Engine:
     # Import models so that they are registered for SQLModel.metadata
     import models
     engine = create_engine(connection_string, echo=True)
-    SQLModel.metadata.drop_all(engine)
     SQLModel.metadata.create_all(engine)
 
     print("Created models.")

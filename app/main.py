@@ -1,9 +1,9 @@
-from typing import Union
 from contextlib import asynccontextmanager
-from models import Note, Tag, NoteBase
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from sqlmodel import Session, select
+
 import db
+from models import Note, Tag, NoteBase
 
 
 @asynccontextmanager
@@ -13,7 +13,6 @@ async def lifespan(app: FastAPI):
     yield
     
 
-
 app = FastAPI(lifespan=lifespan)
 engine = None
 
@@ -21,7 +20,7 @@ engine = None
 
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    return {"version": "0.0.1"}
 
 
 @app.post("/notes/", response_model=Note)
@@ -72,7 +71,6 @@ def get_notes():
         return base_notes
 
 
-
 @app.get("/tags/")
 def get_tags() -> list[Tag]:
     with Session(engine) as session:
@@ -82,5 +80,10 @@ def get_tags() -> list[Tag]:
 
 
 @app.get("/notes/{note_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
+def read_item(note_id: int):
+    with Session(engine) as session:
+        try:
+            note = session.exec(select(Note).where(Note.id == note_id)).one()
+            return note
+        except:
+            raise HTTPException(status_code=404, detail=f"Note with id {note_id} not found.")

@@ -3,17 +3,18 @@ version: '3'
 services:
   backend:
     build: .
-    network_mode: host
+    ports:
+      - "8000:8000"
     env_file:
       - .env
     volumes:
       - "./app/:/app/"
+    command: uvicorn main:app --reload --host ${HOST}
+
 
   db:
     image: postgres:11.9-alpine
     restart: always
-    ports:
-      - "6007:5432"
     env_file:
       - .env
     volumes:
